@@ -72,7 +72,7 @@ def create_recipt():
   request_keys=list(request_data.keys())
 
   if 'title' not in request_keys or 'making_time' not in request_keys or 'serves' not in request_keys or 'ingredients'  not in request_keys or 'cost'  not in request_keys:
-    return jsonify(errmsg),400
+    return jsonify(errmsg),200
   else:
     new_recipe={
       'id':recipes[-1]['id'] + 1,
@@ -104,7 +104,7 @@ def update_recipe(id=1):
     recipe.update({'ingredients': request_data.get('ingredients',recipe['ingredients']) })
     recipe.update({'cost': request_data.get('cost',recipe['cost']) })
     recipe.update({'updated_at':cts})
-    return jsonify({'message': 'Recipe successfully updated!','recipe':[queryrecipe(recipe)]}),202
+    return jsonify({'message': 'Recipe successfully updated!','recipe':[queryrecipe(recipe)]}),200
   else:
     return jsonify ({'message': 'recipe not found'}),200
 
@@ -121,5 +121,5 @@ def delete_recipe(id):
   else:
     return jsonify({"message": "No Recipe found"}),200
   
-if __name__ == 'main':
-  app.run()
+# if __name__ == 'main':
+app.run()
