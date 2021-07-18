@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request
+from flask import Flask,jsonify,request,render_template
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -44,7 +44,7 @@ recipes = [
 
 @app.route('/')
 def home():
-  return f"for NNLife codeing test",200
+  return render_template('index.html'),200
 
 
 @app.route('/recipes',methods=['GET'])
@@ -85,7 +85,7 @@ def create_recipt():
       "updated_at":cts
     }
   recipes.append(new_recipe)  
-  return jsonify({'message': 'Recipe successfully created!','recipe':[new_recipe]}),201
+  return jsonify({'message': 'Recipe successfully created!','recipe':[new_recipe]}),200
 
 
 @app.route('/recipes/<int:id>', methods=['PATCH'])
@@ -123,3 +123,5 @@ def delete_recipe(id):
   
 if __name__ == 'main':
   app.run()
+
+app.run()  
