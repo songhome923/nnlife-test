@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request,render_template
+from flask import Flask,jsonify,request
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -44,7 +44,7 @@ recipes = [
 
 @app.route('/')
 def home():
-  return "Hello, World!"
+  return f"Hello, World!"
 
 
 @app.route('/recipes',methods=['GET'])
@@ -57,7 +57,8 @@ def get_recipes():
 
 
 @app.route('/recipes/<int:id>',methods=['GET'])
-def get_recipe(id):
+@app.route('/recipes/',methods=['GET'])
+def get_recipe(id=1):
   for recipe in recipes:
       if recipe['id'] == id:
           return jsonify({'message': 'Recipe details by id','recipe':[queryrecipe(recipe)]})
@@ -109,4 +110,5 @@ def create_recipt():
 #   tasks.remove(task)
 #   return jsonify({'result': True})
 
-app.run()
+if __name__ == 'main':
+    app.run() #啟動伺服器
