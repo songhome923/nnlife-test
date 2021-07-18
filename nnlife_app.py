@@ -44,7 +44,7 @@ recipes = [
 
 @app.route('/')
 def home():
-  return render_template('index.html'),200
+  return "no resource",404
 
 
 @app.route('/recipes',methods=['GET'])
