@@ -1,9 +1,6 @@
 from flask import Flask,jsonify,request,render_template
-from flask_httpauth import HTTPBasicAuth
 
-auth = HTTPBasicAuth()
 app = Flask(__name__)
-
 
 tasks = [
     {
@@ -19,12 +16,6 @@ tasks = [
         'done': False
     }
 ]
-
-@auth.verify_password
-def verify_password(username, password):
-    if username=="test" and password=="Orion123":
-      return True
-    return False
 
 @app.route('/')
 def home():
@@ -88,7 +79,6 @@ def update_task(task_id):
 
 
 @app.route('/task/<int:task_id>', methods=['DELETE'])
-@auth.login_required
 def delete_task(task_id):
   for task in tasks:
     if task['id'] == task_id:
