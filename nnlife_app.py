@@ -62,7 +62,7 @@ def get_recipe(id=1):
   for recipe in recipes:
       if recipe['id'] == id:
           return jsonify({'message': 'Recipe details by id','recipe':[queryrecipe(recipe)]})
-  return jsonify ({'message': 'recipe not found'}),200
+  return jsonify ({'message': "No Recipe found"}),200
   #pass
 
 @app.route('/recipes', methods=['POST'])
@@ -88,27 +88,38 @@ def create_recipt():
   return jsonify({'message': 'Recipe successfully created!','recipe':[new_recipe]}),201
 
 
-# @app.route('/task/<int:task_id>', methods=['PUT'])
-# def update_task(task_id):
-#   request_data = request.get_json()
-#   for task in tasks:
-#     if task['id'] == task_id:
-#       break
+@app.route('/recipes/<int:id>', methods=['PATCH'])
+@app.route('/recipes/', methods=['PATCH'])
+def update_recipe(id=1):
+  request_data = request.get_json()
+  IsExist=0
+  for recipe in recipes:
+    if recipe['id'] == id:
+      IsExist=1
+      break
+  if IsExist==1:
+    recipe.update({'title': request_data.get('title',recipe['title']) })
+    recipe.update({'making_time': request_data.get('making_time',recipe['making_time']) })
+    recipe.update({'serves': request_data.get('serves',recipe['serves']) })
+    recipe.update({'ingredients': request_data.get('ingredients',recipe['ingredients']) })
+    recipe.update({'cost': request_data.get('cost',recipe['cost']) })
+    recipe.update({'updated_at':cts})
+    return jsonify({'message': 'Recipe successfully updated!','recipe':[queryrecipe(recipe)]}),202
+  else:
+    return jsonify ({'message': 'recipe not found'}),200
 
-#   task.update({'title': request_data.get('title',task['title']) })
-#   task.update({'description': request_data.get('description',task['description']) })
-#   task.update({'done': request_data.get('done',task['done']) })
+@app.route('/recipes/<int:id>', methods=['DELETE'])
+def delete_recipe(id):
+  IsExist=0
+  for recipe in recipes:
+    if recipe['id'] == id:
+      IsExist=1
+      break
+  if IsExist==1:
+    recipes.remove(recipe)
+    return jsonify({"message": "Recipe successfully removed!"}),200
+  else:
+    return jsonify({"message": "No Recipe found"}),200
   
-#   return jsonify(task)
-
-
-# @app.route('/task/<int:task_id>', methods=['DELETE'])
-# def delete_task(task_id):
-#   for task in tasks:
-#     if task['id'] == task_id:
-#       break
-#   tasks.remove(task)
-#   return jsonify({'result': True})
-
-if __name__ == 'main':
-    app.run() #啟動伺服器
+# if __name__ == 'main':
+app.run()
