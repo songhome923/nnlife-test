@@ -1,78 +1,112 @@
 from flask import Flask,jsonify,request,render_template
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
+app.config['JSON_SORT_KEYS'] = False
 
-tasks = [
+import datetime;
+ct = datetime.datetime.now()
+cts=ct.strftime("%Y-%m-%d %H:%M:%S")
+
+def queryrecipe(recipe):
+  output={'id':recipe['id']
+  ,'title':recipe['title']
+  ,'making_time':recipe['making_time']
+  ,'serves':recipe['serves']
+  ,'ingredients':recipe['ingredients']
+  ,'cost':recipe['cost']
+  }
+  return(output)
+
+recipes = [
     {
-        'id': 1,
-        'title': u'Buy groceries',
-        'description': u'Milk, Cheese, Pizza, Fruit, Tylenol', 
-        'done': False
+        'id':1,
+        'title':u'チキンカレー',
+        'making_time':u'45分',
+        'serves':u'4人',
+        'ingredients': u'玉ねぎ,肉,スパイス',
+        'cost':1000,
+        'created_at':'2016-01-10 12:10:12',
+        'updated_at':'2016-01-10 12:10:12'
     },
     {
-        'id': 2,
-        'title': u'Learn Python',
-        'description': u'Need to find a good Python tutorial on the web', 
-        'done': False
+        'id':2,
+        'title':u'オムライス',
+        'making_time':u'30分',
+        'serves':u'2人',
+        'ingredients': u'玉ねぎ,卵,スパイス,醤油',
+        'cost':700,
+        'created_at':'2016-01-11 13:10:12',
+        'updated_at':'2016-01-11 13:10:12'
     }
 ]
+
 
 @app.route('/')
 def home():
   return "Hello, World!"
 
 
-#get /store
-@app.route('/task')
-def get_tasks():
-  return jsonify(tasks)
+@app.route('/recipes',methods=['GET'])
+def get_recipes():
+  result=[]
+  for recipe in recipes:
+    result.append(queryrecipe(recipe))
+  return jsonify({'recipes':result}),200
   #pass
 
-#get /store/<name> data: {name :}
-@app.route('/task/<int:task_id>')
-def get_task(task_id):
-  for task in tasks:
-      if task['id'] == task_id:
-          return jsonify(task)
-  return jsonify ({'message': 'task not found'})
+
+@app.route('/recipes/<int:id>',methods=['GET'])
+def get_recipe(id):
+  for recipe in recipes:
+      if recipe['id'] == id:
+          return jsonify({'message': 'Recipe details by id','recipe':[queryrecipe(recipe)]})
+  return jsonify ({'message': 'recipe not found'}),200
   #pass
 
-@app.route('/task', methods=['POST'])
-def create_task():
+@app.route('/recipes', methods=['POST'])
+def create_recipt():
+  errmsg={'message':"Recipe creation failed!","required": "title, making_time, serves, ingredients, cost"}
   request_data = request.get_json()
-  if not request_data.get('title'):
-    return jsonify("Error"),400
+  request_keys=list(request_data.keys())
+
+  if 'title' not in request_keys or 'making_time' not in request_keys or 'serves' not in request_keys or 'ingredients'  not in request_keys or 'cost'  not in request_keys:
+    return jsonify(errmsg),400
   else:
-    new_task={
-      'id':tasks[-1]['id'] + 1,
+    new_recipe={
+      'id':recipes[-1]['id'] + 1,
       'title':request_data['title'],
-      'description':request_data.get('description','none'),
-      'done':False
+      "making_time": request_data['making_time'],
+      "serves": request_data['serves'],
+      "ingredients": request_data['ingredients'],
+      "cost": request_data['cost'],
+      "created_at":cts,
+      "updated_at":cts
     }
-  tasks.append(new_task)
-  return jsonify(new_task),201
+  recipes.append(new_recipe)  
+  return jsonify({'message': 'Recipe successfully created!','recipe':[new_recipe]}),201
 
 
-@app.route('/task/<int:task_id>', methods=['PUT'])
-def update_task(task_id):
-  request_data = request.get_json()
-  for task in tasks:
-    if task['id'] == task_id:
-      break
+# @app.route('/task/<int:task_id>', methods=['PUT'])
+# def update_task(task_id):
+#   request_data = request.get_json()
+#   for task in tasks:
+#     if task['id'] == task_id:
+#       break
 
-  task.update({'title': request_data.get('title',task['title']) })
-  task.update({'description': request_data.get('description',task['description']) })
-  task.update({'done': request_data.get('done',task['done']) })
+#   task.update({'title': request_data.get('title',task['title']) })
+#   task.update({'description': request_data.get('description',task['description']) })
+#   task.update({'done': request_data.get('done',task['done']) })
   
-  return jsonify(task)
+#   return jsonify(task)
 
 
-@app.route('/task/<int:task_id>', methods=['DELETE'])
-def delete_task(task_id):
-  for task in tasks:
-    if task['id'] == task_id:
-      break
-  tasks.remove(task)
-  return jsonify({'result': True})
+# @app.route('/task/<int:task_id>', methods=['DELETE'])
+# def delete_task(task_id):
+#   for task in tasks:
+#     if task['id'] == task_id:
+#       break
+#   tasks.remove(task)
+#   return jsonify({'result': True})
 
-app.run(host = '0.0.0.0' ,port = 5000, debug = 'True')
+app.run()
