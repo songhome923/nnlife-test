@@ -121,5 +121,5 @@ def delete_recipe(id):
   else:
     return jsonify({"message": "No Recipe found"}),200
   
-# if __name__ == 'main':
-app.run()
+if __name__ == 'main':
+  app.run()
