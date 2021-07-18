@@ -123,5 +123,3 @@ def delete_recipe(id):
   
 if __name__ == 'main':
   app.run()
-
-app.run()  
