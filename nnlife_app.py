@@ -19,10 +19,11 @@ delete_sql="delete from recipes where id={0}"
 
 
 import datetime;
-ct = datetime.datetime.now()
-cts=ct.strftime("%Y-%m-%d %H:%M:%S")
 
-
+def GetCurrentDt():
+  ct = datetime.datetime.now()
+  cts=ct.strftime("%Y-%m-%d %H:%M:%S")
+  return(cts)
 
 def query2dict(header,result):
   query_output={}
@@ -123,6 +124,7 @@ def create_recipt():
   if 'title' not in request_keys or 'making_time' not in request_keys or 'serves' not in request_keys or 'ingredients'  not in request_keys or 'cost'  not in request_keys:
     return jsonify(errmsg),200
   else:
+    cts=GetCurrentDt()
     db_cursor.execute(insert_sql.format(request_data['title'],request_data['making_time'],request_data['serves'],request_data['ingredients'],request_data['cost'],cts,cts))
     conn.commit()
     db_cursor.execute(query_sql+' where id =(select max(id) from recipes)')
@@ -139,6 +141,7 @@ def update_recipe(id=1):
   if queryresult==None:
     return jsonify ({'message': 'recipe not found'}),200
   else:
+    cts=GetCurrentDt()
     db_cursor.execute(update_sql.format(request_data['title'],request_data['making_time'],request_data['serves'],request_data['ingredients'],request_data['cost'],cts,id))
     conn.commit()
     db_cursor.execute(query_sql+' where id={0}'.format(id))
