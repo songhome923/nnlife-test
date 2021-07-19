@@ -7,67 +7,13 @@ app.config['JSON_SORT_KEYS'] = False
 
 import sqlite3
 conn = sqlite3.connect('db.recipes', check_same_thread=False)
+db_cursor=conn.cursor()
 
 query_sql='select id,title,making_time,serves,ingredients,cost from recipes'
 insert_sql="INSERT INTO recipes VALUES (NULL,'{0}','{1}','{2}','{3}',{4},'{5}','{6}')"
 update_sql="update recipes set title='{0}',making_time='{1}',serves='{2}',ingredients='{3}',cost='{4}',updated_at='{5}' where id={6}"
 delete_sql="delete from recipes where id={0}"
 
-db_cursor=conn.cursor()
-db_cursor.execute("DROP TABLE IF EXISTS recipes")
-db_cursor.execute("""CREATE TABLE IF NOT EXISTS recipes (
-  id integer PRIMARY KEY AUTOINCREMENT,
-  title TEXT NOT NULL,
-  making_time TEXT NOT NULL,
-  serves TEXT NOT NULL,
-  ingredients TEXT NOT NULL,
-  cost integer NOT NULL,
-  created_at datetime ,
-  updated_at datetime
-);""")
-
-db_cursor.execute("""INSERT INTO recipes (
-  id,
-  title,
-  making_time,
-  serves,
-  ingredients,
-  cost,
-  created_at,
-  updated_at
-)
-VALUES (
-  1,
-  'チキンカレー',
-  '45分',
-  '4人',
-  '玉ねぎ,肉,スパイス',
-  1000,
-  '2016-01-10 12:10:12',
-  '2016-01-10 12:10:12'
-);""")
-
-db_cursor.execute("""INSERT INTO recipes (
-  id,
-  title,
-  making_time,
-  serves,
-  ingredients,
-  cost,
-  created_at,
-  updated_at
-)
-VALUES (
-  2,
-  'オムライス',
-  '30分',
-  '2人',
-  '玉ねぎ,卵,スパイス,醤油',
-  700,
-  '2016-01-11 13:10:12',
-  '2016-01-11 13:10:12'
-);""")
-conn.commit()
 #conn.close()
 
 
@@ -90,6 +36,62 @@ def query2dict(header,result):
 def home():
   return "no resource",404
 
+@app.route('/recipes',methods=['PURGE'])
+def inidb():
+  db_cursor.execute("DROP TABLE IF EXISTS recipes")
+  db_cursor.execute("""CREATE TABLE IF NOT EXISTS recipes (
+    id integer PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    making_time TEXT NOT NULL,
+    serves TEXT NOT NULL,
+    ingredients TEXT NOT NULL,
+    cost integer NOT NULL,
+    created_at datetime ,
+    updated_at datetime
+  );""")
+
+  db_cursor.execute("""INSERT INTO recipes (
+    id,
+    title,
+    making_time,
+    serves,
+    ingredients,
+    cost,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    1,
+    'チキンカレー',
+    '45分',
+    '4人',
+    '玉ねぎ,肉,スパイス',
+    1000,
+    '2016-01-10 12:10:12',
+    '2016-01-10 12:10:12'
+  );""")
+
+  db_cursor.execute("""INSERT INTO recipes (
+    id,
+    title,
+    making_time,
+    serves,
+    ingredients,
+    cost,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    2,
+    'オムライス',
+    '30分',
+    '2人',
+    '玉ねぎ,卵,スパイス,醤油',
+    700,
+    '2016-01-11 13:10:12',
+    '2016-01-11 13:10:12'
+  );""")
+  conn.commit()  
 
 @app.route('/recipes',methods=['GET'])
 def get_recipes():
