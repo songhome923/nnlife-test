@@ -1,5 +1,4 @@
 from flask import Flask,jsonify,request,render_template
-
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.config['JSON_SORT_KEYS'] = False
@@ -8,39 +7,14 @@ app.config['JSON_SORT_KEYS'] = False
 import sqlite3
 conn = sqlite3.connect('db.recipes', check_same_thread=False)
 db_cursor=conn.cursor()
-
 query_sql='select id,title,making_time,serves,ingredients,cost from recipes'
 insert_sql="INSERT INTO recipes VALUES (NULL,'{0}','{1}','{2}','{3}',{4},'{5}','{6}')"
 update_sql="update recipes set title='{0}',making_time='{1}',serves='{2}',ingredients='{3}',cost='{4}',updated_at='{5}' where id={6}"
 delete_sql="delete from recipes where id={0}"
 
-#conn.close()
-
-
-
-import datetime;
-
-def GetCurrentDt():
-  ct = datetime.datetime.now()
-  cts=ct.strftime("%Y-%m-%d %H:%M:%S")
-  return(cts)
-
-def query2dict(header,result):
-  query_output={}
-  for i in range(len(header)):
-      query_output[header[i][0]]=result[i]
-  return(query_output)
-
-##################################################################
-
-@app.route('/')
-def home():
-  return "no resource",404
-
-@app.route('/recipes',methods=['PURGE'])
-def inidb():
-  db_cursor.execute("DROP TABLE IF EXISTS recipes")
-  db_cursor.execute("""CREATE TABLE IF NOT EXISTS recipes (
+def DbInit(cursor):
+  cursor.execute("DROP TABLE IF EXISTS recipes")
+  cursor.execute("""CREATE TABLE IF NOT EXISTS recipes (
     id integer PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     making_time TEXT NOT NULL,
@@ -51,7 +25,7 @@ def inidb():
     updated_at datetime
   );""")
 
-  db_cursor.execute("""INSERT INTO recipes (
+  cursor.execute("""INSERT INTO recipes (
     id,
     title,
     making_time,
@@ -72,7 +46,7 @@ def inidb():
     '2016-01-10 12:10:12'
   );""")
 
-  db_cursor.execute("""INSERT INTO recipes (
+  cursor.execute("""INSERT INTO recipes (
     id,
     title,
     making_time,
@@ -92,6 +66,33 @@ def inidb():
     '2016-01-11 13:10:12',
     '2016-01-11 13:10:12'
   );""")
+
+DbInit(db_cursor)
+conn.commit()  
+
+
+
+import datetime;
+def GetCurrentDt():
+  ct = datetime.datetime.now()
+  cts=ct.strftime("%Y-%m-%d %H:%M:%S")
+  return(cts)
+
+def query2dict(header,result):
+  query_output={}
+  for i in range(len(header)):
+      query_output[header[i][0]]=result[i]
+  return(query_output)
+
+##################################################################
+
+@app.route('/')
+def home():
+  return "no resource",404
+
+@app.route('/recipes',methods=['PURGE'])
+def inidb():
+  DbInit(db_cursor)
   conn.commit()  
   return "reset",200
 
