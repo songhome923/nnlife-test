@@ -124,6 +124,7 @@ def create_recipt():
     return jsonify(errmsg),200
   else:
     db_cursor.execute(insert_sql.format(request_data['title'],request_data['making_time'],request_data['serves'],request_data['ingredients'],request_data['cost'],cts,cts))
+    conn.commit()
     db_cursor.execute(query_sql+' where id =(select max(id) from recipes)')
     queryresult=db_cursor.fetchone()
   return jsonify({'message': 'Recipe successfully created!','recipe':[query2dict(db_cursor.description,queryresult)]}),200
@@ -139,6 +140,7 @@ def update_recipe(id=1):
     return jsonify ({'message': 'recipe not found'}),200
   else:
     db_cursor.execute(update_sql.format(request_data['title'],request_data['making_time'],request_data['serves'],request_data['ingredients'],request_data['cost'],cts,id))
+    conn.commit()
     db_cursor.execute(query_sql+' where id={0}'.format(id))
     queryresult=db_cursor.fetchone()
     return jsonify({'message': 'Recipe successfully updated!','recipe':[query2dict(db_cursor.description,queryresult)]}),200    
@@ -151,6 +153,7 @@ def delete_recipe(id):
     return jsonify ({'message': 'recipe not found'}),200
   else:
     db_cursor.execute(delete_sql.format(id))
+    conn.commit()
     return jsonify({"message": "Recipe successfully removed!"}),200  
 
 if __name__ == 'main':
