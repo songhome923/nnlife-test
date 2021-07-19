@@ -92,6 +92,7 @@ def inidb():
     '2016-01-11 13:10:12'
   );""")
   conn.commit()  
+  return "reset",200
 
 @app.route('/recipes',methods=['GET'])
 def get_recipes():
@@ -154,4 +155,5 @@ def delete_recipe(id):
 
 if __name__ == 'main':
   app.run()
+# app.run()  
 
